@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>HelloWeb3 dApp</title>
+<style>
+  body { font-family: sans-serif; max-width: 500px; margin: 60px auto; padding: 0 20px; }
+  button { padding: 10px 16px; margin: 8px 0; cursor: pointer; }
+  input { padding: 8px; width: 100%; box-sizing: border-box; margin: 8px 0; }
+  #status { color: #555; font-size: 14px; margin-top: 12px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<h1>HelloWeb3</h1>
+
+<button id="connectBtn">Connect Wallet</button>
+<p id="account"></p>
+
+<h3>Current Message</h3>
+<p id="currentMessage">(not loaded yet)</p>
+<button id="readBtn">Refresh Message</button>
+
+<h3>Update Message</h3>
+<input id="newMessageInput" placeholder="Type a new message" />
+<button id="writeBtn">Send Update</button>
+
+<div id="status"></div>
+
+<script type="module">
+  import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";
+
+  const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const CONTRACT_ABI = [
+    {
+      "inputs": [{ "internalType": "string", "name": "initialMessage", "type": "string" }],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "message",
+      "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "string", "name": "newMessage", "type": "string" }],
+      "name": "setMessage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ];
+
+  let provider, signer, contract;
+  const statusEl = document.getElementById("status");
+  const log = (msg) => { statusEl.textContent = msg; console.log(msg); };
+
+  document.getElementById("connectBtn").addEventListener("click", async () => {
+    if (!window.ethereum) {
+      log("No wallet found. Install MetaMask.");
+      return;
+    }
+    try {
+      provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = await provider.getSigner();
+      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      const address = await signer.getAddress();
+      document.getElementById("account").textContent = "Connected: " + address;
+      log("Wallet connected.");
+      await readMessage();
+    } catch (err) {
+      log("Connection failed: " + err.message);
+    }
+  });
+
+  async function readMessage() {
+    if (!contract) {
+      log("Connect your wallet first.");
+      return;
+    }
+    try {
+      const msg = await contract.message();
+      document.getElementById("currentMessage").textContent = msg;
+      log("Message loaded.");
+    } catch (err) {
+      log("Read failed: " + err.message);
+    }
+  }
+
+  document.getElementById("readBtn").addEventListener("click", readMessage);
+
+  document.getElementById("writeBtn").addEventListener("click", async () => {
+    if (!contract) {
+      log("Connect your wallet first.");
+      return;
+    }
+    const newMessage = document.getElementById("newMessageInput").value;
+    if (!newMessage) {
+      log("Type a message first.");
+      return;
+    }
+    try {
+      log("Sending transaction...");
+      const tx = await contract.setMessage(newMessage);
+      log("Waiting for confirmation... tx: " + tx.hash);
+      await tx.wait();
+      log("Message updated!");
+      await readMessage();
+    } catch (err) {
+      log("Transaction failed: " + err.message);
+    }
+  });
+</script>
+
+</body>
+</html>
