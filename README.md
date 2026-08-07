@@ -58,10 +58,8 @@ Open `frontend/index.html` with a local server (e.g. VS Code's Live Server exten
 ## Known limitations
 
 - Deployed only to a local Hardhat network — not yet deployed to a public testnet
-- No frontend styling beyond basic layout
 
 ## Future improvements
 
 - Deploy to a public testnet (e.g. Sepolia)
 - Add event listening so the UI updates in real time when the message changes
-- Improve UI styling
