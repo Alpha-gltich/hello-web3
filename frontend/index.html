@@ -2,30 +2,254 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>HelloWeb3 dApp</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HelloWeb3 — On-Chain Message</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  body { font-family: sans-serif; max-width: 500px; margin: 60px auto; padding: 0 20px; }
-  button { padding: 10px 16px; margin: 8px 0; cursor: pointer; }
-  input { padding: 8px; width: 100%; box-sizing: border-box; margin: 8px 0; }
-  #status { color: #555; font-size: 14px; margin-top: 12px; white-space: pre-wrap; }
+  :root {
+    --desk: #14120e;
+    --desk-edge: #0d0b08;
+    --paper: #ece5d3;
+    --paper-shadow: #cfc7b2;
+    --ink: #2a2419;
+    --ink-dim: #6b6353;
+    --amber: #ffb02e;
+    --amber-dim: #8a5f16;
+    --ok: #6fae62;
+    --err: #d9695a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 16px;
+    background:
+      radial-gradient(ellipse at top, #1c1912 0%, var(--desk) 55%, var(--desk-edge) 100%);
+    font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+    color: var(--ink);
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .brand {
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .brand .name {
+    color: var(--amber);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+  }
+  .brand .tag {
+    color: #5c5648;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  .receipt {
+    background: var(--paper);
+    color: var(--ink);
+    padding: 30px 26px 22px;
+    position: relative;
+    box-shadow:
+      0 1px 0 var(--paper-shadow) inset,
+      0 24px 48px -16px rgba(0,0,0,0.65),
+      0 2px 0 rgba(0,0,0,0.2);
+    background-image:
+      repeating-linear-gradient(
+        transparent, transparent 27px, rgba(0,0,0,0.035) 27px, rgba(0,0,0,0.035) 28px
+      );
+  }
+  .receipt::before,
+  .receipt::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    height: 10px;
+    background:
+      radial-gradient(circle at 8px 5px, var(--desk) 4.5px, transparent 5px) repeat-x;
+    background-size: 16px 10px;
+  }
+  .receipt::before { top: -5px; }
+  .receipt::after { bottom: -5px; transform: rotate(180deg); }
+
+  .row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px dashed var(--ink-dim);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+  }
+  .row-head .title { font-weight: 700; font-size: 13px; letter-spacing: 0.05em; }
+  .row-head .id { font-size: 10px; color: var(--ink-dim); }
+
+  .step {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--paper-shadow);
+  }
+  .step:last-of-type { border-bottom: none; }
+  .step .num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-dim);
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+  .step .body { flex: 1; min-width: 0; }
+  .step .label {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  button:hover { background: var(--ink); color: var(--paper); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button:disabled:hover { background: transparent; color: var(--ink); }
+
+  input {
+    font-family: inherit;
+    font-size: 13px;
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--paper-shadow);
+    background: #fbf9f2;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  input:focus { outline: 2px solid var(--amber-dim); outline-offset: 1px; }
+
+  .account {
+    font-size: 11px;
+    color: var(--ink-dim);
+    word-break: break-all;
+    margin-top: 6px;
+  }
+  .account.connected { color: var(--ok); }
+
+  .message-display {
+    font-size: 15px;
+    font-weight: 500;
+    min-height: 1.4em;
+    border-left: 2px solid var(--amber);
+    padding-left: 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .cursor {
+    display: inline-block;
+    width: 7px;
+    background: var(--ink);
+    animation: blink 0.9s steps(1) infinite;
+    margin-left: 1px;
+    height: 1em;
+    vertical-align: text-bottom;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .status-bar {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--ink-dim);
+    font-size: 10.5px;
+    color: var(--ink-dim);
+    min-height: 1.4em;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .status-bar.ok { color: var(--ok); }
+  .status-bar.err { color: var(--err); }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 10px;
+    color: #4a4536;
+    letter-spacing: 0.04em;
+  }
+  .footer-note a { color: var(--amber-dim); text-decoration: none; }
+  .footer-note a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<h1>HelloWeb3</h1>
+<div class="wrap">
+  <div class="brand">
+    <div class="name">HELLOWEB3</div>
+    <div class="tag">MINIMAL ON-CHAIN MESSAGE BOARD</div>
+  </div>
 
-<button id="connectBtn">Connect Wallet</button>
-<p id="account"></p>
+  <div class="receipt">
+    <div class="row-head">
+      <span class="title">TRANSMISSION RECEIPT</span>
+      <span class="id" id="chainTag">chain: local</span>
+    </div>
 
-<h3>Current Message</h3>
-<p id="currentMessage">(not loaded yet)</p>
-<button id="readBtn">Refresh Message</button>
+    <div class="step">
+      <span class="num">01</span>
+      <div class="body">
+        <div class="label">Connect</div>
+        <button id="connectBtn">Connect Wallet</button>
+        <div class="account" id="account">not connected</div>
+      </div>
+    </div>
 
-<h3>Update Message</h3>
-<input id="newMessageInput" placeholder="Type a new message" />
-<button id="writeBtn">Send Update</button>
+    <div class="step">
+      <span class="num">02</span>
+      <div class="body">
+        <div class="label">Current message on-chain</div>
+        <div class="message-display" id="currentMessage">—<span class="cursor"></span></div>
+        <div style="margin-top:10px;">
+          <button id="readBtn">Refresh</button>
+        </div>
+      </div>
+    </div>
 
-<div id="status"></div>
+    <div class="step">
+      <span class="num">03</span>
+      <div class="body">
+        <div class="label">Send new message</div>
+        <input id="newMessageInput" placeholder="type a message to write on-chain" maxlength="140" />
+        <button id="writeBtn">Send Update</button>
+      </div>
+    </div>
+
+    <div class="status-bar" id="status">ready.</div>
+  </div>
+
+  <div class="footer-note">
+    open source — <a href="https://github.com/Alpha-gltich/hello-web3" target="_blank" rel="noreferrer">github.com/Alpha-gltich/hello-web3</a>
+  </div>
+</div>
 
 <script type="module">
   import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";
@@ -61,63 +285,99 @@
   ];
 
   let provider, signer, contract;
-  const statusEl = document.getElementById("status");
-  const log = (msg) => { statusEl.textContent = msg; console.log(msg); };
 
-  document.getElementById("connectBtn").addEventListener("click", async () => {
+  const statusEl = document.getElementById("status");
+  const accountEl = document.getElementById("account");
+  const msgEl = document.getElementById("currentMessage");
+  const connectBtn = document.getElementById("connectBtn");
+  const readBtn = document.getElementById("readBtn");
+  const writeBtn = document.getElementById("writeBtn");
+
+  function log(msg, kind = "") {
+    statusEl.textContent = msg;
+    statusEl.className = "status-bar" + (kind ? " " + kind : "");
+    console.log(msg);
+  }
+
+  async function typeMessage(text) {
+    msgEl.innerHTML = "";
+    const cursor = document.createElement("span");
+    cursor.className = "cursor";
+    for (let i = 0; i < text.length; i++) {
+      msgEl.textContent = text.slice(0, i + 1);
+      msgEl.appendChild(cursor);
+      await new Promise((r) => setTimeout(r, 16));
+    }
+    if (text.length === 0) {
+      msgEl.textContent = "(empty)";
+      msgEl.appendChild(cursor);
+    }
+  }
+
+  connectBtn.addEventListener("click", async () => {
     if (!window.ethereum) {
-      log("No wallet found. Install MetaMask.");
+      log("No wallet found. Install MetaMask to continue.", "err");
       return;
     }
+    connectBtn.disabled = true;
     try {
       provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       signer = await provider.getSigner();
       contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
       const address = await signer.getAddress();
-      document.getElementById("account").textContent = "Connected: " + address;
-      log("Wallet connected.");
+      accountEl.textContent = address;
+      accountEl.classList.add("connected");
+      log("wallet connected.", "ok");
       await readMessage();
     } catch (err) {
-      log("Connection failed: " + err.message);
+      log("connection failed: " + err.message, "err");
+    } finally {
+      connectBtn.disabled = false;
     }
   });
 
   async function readMessage() {
     if (!contract) {
-      log("Connect your wallet first.");
+      log("connect your wallet first.", "err");
       return;
     }
+    readBtn.disabled = true;
     try {
       const msg = await contract.message();
-      document.getElementById("currentMessage").textContent = msg;
-      log("Message loaded.");
+      await typeMessage(msg);
+      log("message loaded.", "ok");
     } catch (err) {
-      log("Read failed: " + err.message);
+      log("read failed: " + err.message, "err");
+    } finally {
+      readBtn.disabled = false;
     }
   }
+  readBtn.addEventListener("click", readMessage);
 
-  document.getElementById("readBtn").addEventListener("click", readMessage);
-
-  document.getElementById("writeBtn").addEventListener("click", async () => {
+  writeBtn.addEventListener("click", async () => {
     if (!contract) {
-      log("Connect your wallet first.");
+      log("connect your wallet first.", "err");
       return;
     }
     const newMessage = document.getElementById("newMessageInput").value;
     if (!newMessage) {
-      log("Type a message first.");
+      log("type a message first.", "err");
       return;
     }
+    writeBtn.disabled = true;
     try {
-      log("Sending transaction...");
+      log("sending transaction...");
       const tx = await contract.setMessage(newMessage);
-      log("Waiting for confirmation... tx: " + tx.hash);
+      log("waiting for confirmation... tx: " + tx.hash);
       await tx.wait();
-      log("Message updated!");
+      log("message updated on-chain.", "ok");
+      document.getElementById("newMessageInput").value = "";
       await readMessage();
     } catch (err) {
-      log("Transaction failed: " + err.message);
+      log("transaction failed: " + err.message, "err");
+    } finally {
+      writeBtn.disabled = false;
     }
   });
 </script>
