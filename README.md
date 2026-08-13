@@ -55,11 +55,12 @@ Open `frontend/index.html` with a local server (e.g. VS Code's Live Server exten
 - Import one of the test accounts printed by `npx hardhat node` (e.g. Account #0) using its private key
 - Click "Connect Wallet" on the page
 
-## Known limitations
+## Deployment
 
-- Deployed only to a local Hardhat network — not yet deployed to a public testnet
+Deployed to Sepolia testnet: `0x76fe487AD578aAD1A2583ADBFA36dAB74e0c35d3`
+
+[View on Etherscan](https://sepolia.etherscan.io/address/0x76fe487AD578aAD1A2583ADBFA36dAB74e0c35d3)
 
 ## Future improvements
 
-- Deploy to a public testnet (e.g. Sepolia)
 - Add event listening so the UI updates in real time when the message changes
