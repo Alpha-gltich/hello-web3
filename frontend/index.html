@@ -6,169 +6,230 @@
 <title>HelloWeb3 — On-Chain Message</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --desk: #14120e;
-    --desk-edge: #0d0b08;
-    --paper: #ece5d3;
-    --paper-shadow: #cfc7b2;
-    --ink: #2a2419;
-    --ink-dim: #6b6353;
-    --amber: #ffb02e;
-    --amber-dim: #8a5f16;
-    --ok: #6fae62;
-    --err: #d9695a;
+    --bg: #0a0e1a;
+    --bg-glow: #10162a;
+    --card: #10141f;
+    --card-border: #262c42;
+    --line: #1c2135;
+    --dot: #2a3252;
+    --text: #eef0f6;
+    --muted: #8b93ab;
+    --muted-2: #5c6382;
+    --cyan: #22d3ee;
+    --violet: #7c6cf6;
+    --blue: #3b82f6;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
   }
 
   * { box-sizing: border-box; }
 
-  body {
+  html, body {
     margin: 0;
     min-height: 100vh;
+    background: radial-gradient(ellipse 900px 600px at 20% -10%, var(--bg-glow) 0%, var(--bg) 55%);
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    color: var(--text);
+  }
+
+  body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 48px 16px;
-    background:
-      radial-gradient(ellipse at top, #1c1912 0%, var(--desk) 55%, var(--desk-edge) 100%);
-    font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-    color: var(--ink);
+    padding: 56px 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  #network-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.5;
   }
 
   .wrap {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    max-width: 420px;
+    max-width: 620px;
+  }
+
+  .card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0) 40%), var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 36px 38px 30px;
+    box-shadow:
+      0 0 0 1px rgba(124, 108, 246, 0.06),
+      0 30px 60px -20px rgba(0,0,0,0.6),
+      0 0 80px -30px rgba(124, 108, 246, 0.25);
   }
 
   .brand {
-    text-align: center;
-    margin-bottom: 22px;
-  }
-  .brand .name {
-    color: var(--amber);
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.22em;
-  }
-  .brand .tag {
-    color: #5c5648;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    margin-top: 4px;
-  }
-
-  .receipt {
-    background: var(--paper);
-    color: var(--ink);
-    padding: 30px 26px 22px;
-    position: relative;
-    box-shadow:
-      0 1px 0 var(--paper-shadow) inset,
-      0 24px 48px -16px rgba(0,0,0,0.65),
-      0 2px 0 rgba(0,0,0,0.2);
-    background-image:
-      repeating-linear-gradient(
-        transparent, transparent 27px, rgba(0,0,0,0.035) 27px, rgba(0,0,0,0.035) 28px
-      );
-  }
-  .receipt::before,
-  .receipt::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0;
-    height: 10px;
-    background:
-      radial-gradient(circle at 8px 5px, var(--desk) 4.5px, transparent 5px) repeat-x;
-    background-size: 16px 10px;
-  }
-  .receipt::before { top: -5px; }
-  .receipt::after { bottom: -5px; transform: rotate(180deg); }
-
-  .row-head {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    border-bottom: 1px dashed var(--ink-dim);
-    padding-bottom: 10px;
-    margin-bottom: 18px;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 30px;
   }
-  .row-head .title { font-weight: 700; font-size: 13px; letter-spacing: 0.05em; }
-  .row-head .id { font-size: 10px; color: var(--ink-dim); }
+  .brand h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .brand h1 .web3 {
+    background: linear-gradient(90deg, var(--cyan), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .brand .sub {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+  .brand .sub .rule {
+    height: 2px;
+    width: 34px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--violet), var(--cyan));
+  }
 
   .step {
-    display: flex;
-    gap: 12px;
-    padding: 14px 0;
-    border-bottom: 1px dashed var(--paper-shadow);
+    margin-bottom: 26px;
   }
-  .step:last-of-type { border-bottom: none; }
-  .step .num {
-    font-size: 11px;
+  .step:last-of-type { margin-bottom: 0; }
+
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .badge {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--violet), var(--blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12.5px;
     font-weight: 700;
-    color: var(--ink-dim);
-    padding-top: 2px;
+    color: white;
     flex-shrink: 0;
   }
-  .step .body { flex: 1; min-width: 0; }
-  .step .label {
-    font-size: 11.5px;
+  .step-title {
+    font-size: 15px;
     font-weight: 600;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
+    color: var(--text);
   }
 
   button {
     font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 10px 16px;
-    border: 1px solid var(--ink);
-    background: transparent;
-    color: var(--ink);
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
+    border: none;
   }
-  button:hover { background: var(--ink); color: var(--paper); }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
-  button:disabled:hover { background: transparent; color: var(--ink); }
 
-  input {
-    font-family: inherit;
-    font-size: 13px;
+  .btn-connect {
     width: 100%;
-    padding: 9px 10px;
-    border: 1px solid var(--paper-shadow);
-    background: #fbf9f2;
-    color: var(--ink);
-    margin-bottom: 8px;
+    padding: 13px 16px;
+    border-radius: 12px;
+    background: var(--line);
+    border: 1px solid var(--card-border);
+    color: var(--text);
+    font-size: 14.5px;
+    font-weight: 600;
+    transition: background 0.15s ease, border-color 0.15s ease;
   }
-  input:focus { outline: 2px solid var(--amber-dim); outline-offset: 1px; }
+  .btn-connect:hover { background: #1a1f33; border-color: var(--muted-2); }
+  .btn-connect:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .account {
-    font-size: 11px;
-    color: var(--ink-dim);
-    word-break: break-all;
-    margin-top: 6px;
-  }
-  .account.connected { color: var(--ok); }
-
-  .message-display {
-    font-size: 15px;
+  .wallet-chip {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #0d9488, var(--blue));
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 14px;
     font-weight: 500;
-    min-height: 1.4em;
-    border-left: 2px solid var(--amber);
-    padding-left: 10px;
+    color: white;
+  }
+  .wallet-chip.visible { display: flex; }
+  .wallet-chip .left {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .wallet-chip .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+    flex-shrink: 0;
+  }
+  .wallet-chip .copy-btn {
+    background: rgba(255,255,255,0.15);
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+  }
+  .wallet-chip .copy-btn:hover { background: rgba(255,255,255,0.25); }
+
+  .message-box {
+    position: relative;
+    background: var(--line);
+    border-left: 3px solid var(--cyan);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 18px;
+    padding-right: 100px;
+    min-height: 1.3em;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--text);
     white-space: pre-wrap;
     word-break: break-word;
   }
+  .refresh-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    background: var(--card-border);
+    color: var(--text);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .refresh-btn:hover { background: var(--muted-2); }
+  .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .refresh-btn svg { width: 13px; height: 13px; }
+  .refresh-btn.spinning svg { animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   .cursor {
     display: inline-block;
-    width: 7px;
-    background: var(--ink);
+    width: 6px;
+    background: var(--cyan);
     animation: blink 0.9s steps(1) infinite;
     margin-left: 1px;
     height: 1em;
@@ -176,85 +237,172 @@
   }
   @keyframes blink { 50% { opacity: 0; } }
 
-  .status-bar {
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px dashed var(--ink-dim);
-    font-size: 10.5px;
-    color: var(--ink-dim);
-    min-height: 1.4em;
-    white-space: pre-wrap;
-    word-break: break-word;
+  input {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 12px;
+    background: var(--line);
+    border: 1px solid var(--card-border);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 12px;
   }
-  .status-bar.ok { color: var(--ok); }
-  .status-bar.err { color: var(--err); }
+  input::placeholder { color: var(--muted-2); }
+  input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
 
-  .footer-note {
-    text-align: center;
-    margin-top: 18px;
-    font-size: 10px;
-    color: #4a4536;
-    letter-spacing: 0.04em;
+  .btn-send {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, var(--cyan), var(--blue));
+    color: #061019;
+    font-size: 14.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: filter 0.15s ease;
   }
-  .footer-note a { color: var(--amber-dim); text-decoration: none; }
-  .footer-note a:hover { text-decoration: underline; }
+  .btn-send:hover { filter: brightness(1.08); }
+  .btn-send:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+  .btn-send svg { width: 15px; height: 15px; }
+
+  .status-pill {
+    margin-top: 16px;
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 15px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .status-pill.visible { display: flex; }
+  .status-pill.ok {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    color: #a7f3d4;
+  }
+  .status-pill.pending {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    color: #fde3a7;
+  }
+  .status-pill.err {
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    color: #fecaca;
+  }
+  .status-pill svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+  .status-pill .msg-title { font-weight: 600; }
+  .status-pill a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .status-pill .spin svg { animation: spin 0.9s linear infinite; }
+
+  .footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: var(--muted-2);
+  }
+  .footer a {
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .footer a:hover { color: var(--text); }
+  .footer svg { width: 15px; height: 15px; }
 </style>
 </head>
 <body>
 
+<canvas id="network-bg"></canvas>
+
 <div class="wrap">
-  <div class="brand">
-    <div class="name">HELLOWEB3</div>
-    <div class="tag">MINIMAL ON-CHAIN MESSAGE BOARD</div>
-  </div>
-
-  <div class="receipt">
-    <div class="row-head">
-      <span class="title">TRANSMISSION RECEIPT</span>
-      <span class="id" id="chainTag">chain: local</span>
+  <div class="card">
+    <div class="brand">
+      <h1>HELLO<span class="web3">WEB3</span></h1>
+      <div class="sub">Minimal on-chain message board <span class="rule"></span></div>
     </div>
 
     <div class="step">
-      <span class="num">01</span>
-      <div class="body">
-        <div class="label">Connect</div>
-        <button id="connectBtn">Connect Wallet</button>
-        <div class="account" id="account">not connected</div>
+      <div class="step-head">
+        <div class="badge">1</div>
+        <div class="step-title">Connect Wallet</div>
       </div>
-    </div>
-
-    <div class="step">
-      <span class="num">02</span>
-      <div class="body">
-        <div class="label">Current message on-chain</div>
-        <div class="message-display" id="currentMessage">—<span class="cursor"></span></div>
-        <div style="margin-top:10px;">
-          <button id="readBtn">Refresh</button>
+      <button class="btn-connect" id="connectBtn">Connect Wallet</button>
+      <div class="wallet-chip" id="walletChip">
+        <div class="left">
+          <span class="dot"></span>
+          <span id="walletAddr">0x0000...0000</span>
         </div>
+        <button class="copy-btn" id="copyBtn" title="Copy address">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
       </div>
     </div>
 
     <div class="step">
-      <span class="num">03</span>
-      <div class="body">
-        <div class="label">Send new message</div>
-        <input id="newMessageInput" placeholder="type a message to write on-chain" maxlength="140" />
-        <button id="writeBtn">Send Update</button>
+      <div class="step-head">
+        <div class="badge">2</div>
+        <div class="step-title">Current on-chain message</div>
+      </div>
+      <div class="message-box" id="currentMessage">
+        —<span class="cursor"></span>
+        <button class="refresh-btn" id="readBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Refresh
+        </button>
       </div>
     </div>
 
-    <div class="status-bar" id="status">ready.</div>
-  </div>
+    <div class="step">
+      <div class="step-head">
+        <div class="badge">3</div>
+        <div class="step-title">Send new message</div>
+      </div>
+      <input id="newMessageInput" placeholder="Type a message to write on-chain..." maxlength="140" />
+      <button class="btn-send" id="writeBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7Z"/></svg>
+        Send Update
+      </button>
 
-  <div class="footer-note">
-    open source — <a href="https://github.com/Alpha-gltich/hello-web3" target="_blank" rel="noreferrer">github.com/Alpha-gltich/hello-web3</a>
+      <div class="status-pill" id="statusPill">
+        <span class="icon"></span>
+        <span class="text"></span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Built for a more open web. 💙</span>
+      <a href="https://github.com/Alpha-gltich/hello-web3" target="_blank" rel="noreferrer">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.74.5 12.02c0 5.03 3.26 9.29 7.79 10.8.57.1.78-.25.78-.55v-2.13c-3.17.69-3.83-1.36-3.83-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.53-.29-5.19-1.27-5.19-5.63 0-1.24.44-2.26 1.17-3.06-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.17a10.9 10.9 0 0 1 5.74 0c2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.73.11 3.02.73.8 1.17 1.82 1.17 3.06 0 4.37-2.67 5.34-5.21 5.62.41.36.77 1.06.77 2.15v3.19c0 .31.21.66.79.55A10.53 10.53 0 0 0 23.5 12c0-6.28-5.23-11.5-11.5-11.5Z"/></svg>
+        View on GitHub
+      </a>
+    </div>
   </div>
 </div>
 
 <script type="module">
   import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";
 
-  const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const CONTRACT_ADDRESS = "0x76fe487AD578aAD1A2583ADBFA36dAB74e0c35d3";
+  const SEPOLIA_CHAIN_ID = 11155111n;
   const CONTRACT_ABI = [
     {
       "inputs": [{ "internalType": "string", "name": "initialMessage", "type": "string" }],
@@ -286,100 +434,234 @@
 
   let provider, signer, contract;
 
-  const statusEl = document.getElementById("status");
-  const accountEl = document.getElementById("account");
-  const msgEl = document.getElementById("currentMessage");
   const connectBtn = document.getElementById("connectBtn");
+  const walletChip = document.getElementById("walletChip");
+  const walletAddr = document.getElementById("walletAddr");
+  const copyBtn = document.getElementById("copyBtn");
+  const msgBox = document.getElementById("currentMessage");
   const readBtn = document.getElementById("readBtn");
   const writeBtn = document.getElementById("writeBtn");
+  const input = document.getElementById("newMessageInput");
+  const statusPill = document.getElementById("statusPill");
 
-  function log(msg, kind = "") {
-    statusEl.textContent = msg;
-    statusEl.className = "status-bar" + (kind ? " " + kind : "");
-    console.log(msg);
+  const ICONS = {
+    ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>',
+    pending: '<div class="spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>',
+    err: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',
+  };
+
+  function truncate(addr) {
+    return addr.slice(0, 6) + "..." + addr.slice(-4);
+  }
+
+  function setStatus(kind, html) {
+    statusPill.className = "status-pill visible " + kind;
+    statusPill.querySelector(".icon").innerHTML = ICONS[kind] || "";
+    statusPill.querySelector(".text").innerHTML = html;
+  }
+
+  function clearStatus() {
+    statusPill.className = "status-pill";
   }
 
   async function typeMessage(text) {
-    msgEl.innerHTML = "";
+    const refreshBtn = msgBox.querySelector(".refresh-btn");
+    msgBox.childNodes.forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE || (node.classList && node.classList.contains("cursor"))) {
+        node.remove();
+      }
+    });
     const cursor = document.createElement("span");
     cursor.className = "cursor";
-    for (let i = 0; i < text.length; i++) {
-      msgEl.textContent = text.slice(0, i + 1);
-      msgEl.appendChild(cursor);
-      await new Promise((r) => setTimeout(r, 16));
-    }
-    if (text.length === 0) {
-      msgEl.textContent = "(empty)";
-      msgEl.appendChild(cursor);
+
+    const chars = text.length ? text.split("") : ["(empty)"];
+    let built = "";
+    for (let i = 0; i < chars.length; i++) {
+      built += text.length ? chars[i] : text;
+      const textNode = document.createTextNode(text.length ? built : "(empty)");
+      msgBox.insertBefore(textNode, refreshBtn);
+      msgBox.insertBefore(cursor, refreshBtn);
+      if (i < chars.length - 1) {
+        await new Promise((r) => setTimeout(r, 16));
+        textNode.remove();
+      }
+      if (!text.length) break;
     }
   }
 
   connectBtn.addEventListener("click", async () => {
     if (!window.ethereum) {
-      log("No wallet found. Install MetaMask to continue.", "err");
+      setStatus("err", "No wallet found. Install MetaMask to continue.");
       return;
     }
+
     connectBtn.disabled = true;
+    connectBtn.textContent = "Connecting...";
+
     try {
+      // 1. Request accounts first
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+
+      // 2. Read chainId the reliable way
+      const chainIdHex = await window.ethereum.request({ method: "eth_chainId" });
+      const chainId = BigInt(chainIdHex);
+
+      if (chainId !== SEPOLIA_CHAIN_ID) {
+        // Attempt automatic switch
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0xaa36a7" }], // Sepolia
+          });
+        } catch (switchErr) {
+          setStatus(
+            "err",
+            "Wrong network — please switch MetaMask to <b>Sepolia</b> and try again."
+          );
+          connectBtn.disabled = false;
+          connectBtn.textContent = "Connect Wallet";
+          return;
+        }
+      }
+
+      // 3. Create provider / signer / contract
       provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
       signer = await provider.getSigner();
       contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
       const address = await signer.getAddress();
-      accountEl.textContent = address;
-      accountEl.classList.add("connected");
-      log("wallet connected.", "ok");
+      walletAddr.textContent = truncate(address);
+      walletChip.classList.add("visible");
+      connectBtn.style.display = "none";
+      clearStatus();
+
       await readMessage();
     } catch (err) {
-      log("connection failed: " + err.message, "err");
-    } finally {
+      console.error(err);
+      setStatus("err", "Connection failed: " + (err.reason || err.message));
       connectBtn.disabled = false;
+      connectBtn.textContent = "Connect Wallet";
     }
+  });
+
+  // Keep UI in sync when user switches network or account
+  if (window.ethereum) {
+    window.ethereum.on("chainChanged", () => {
+      window.location.reload();
+    });
+    window.ethereum.on("accountsChanged", () => {
+      window.location.reload();
+    });
+  }
+
+  copyBtn.addEventListener("click", async () => {
+    if (!signer) return;
+    const address = await signer.getAddress();
+    await navigator.clipboard.writeText(address);
+    const original = copyBtn.innerHTML;
+    copyBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
+    setTimeout(() => { copyBtn.innerHTML = original; }, 1200);
   });
 
   async function readMessage() {
     if (!contract) {
-      log("connect your wallet first.", "err");
+      setStatus("err", "Connect your wallet first.");
       return;
     }
     readBtn.disabled = true;
+    readBtn.classList.add("spinning");
     try {
       const msg = await contract.message();
       await typeMessage(msg);
-      log("message loaded.", "ok");
     } catch (err) {
-      log("read failed: " + err.message, "err");
+      setStatus("err", "Read failed: " + err.message);
     } finally {
       readBtn.disabled = false;
+      readBtn.classList.remove("spinning");
     }
   }
   readBtn.addEventListener("click", readMessage);
 
   writeBtn.addEventListener("click", async () => {
     if (!contract) {
-      log("connect your wallet first.", "err");
+      setStatus("err", "Connect your wallet first.");
       return;
     }
-    const newMessage = document.getElementById("newMessageInput").value;
+    const newMessage = input.value;
     if (!newMessage) {
-      log("type a message first.", "err");
+      setStatus("err", "Type a message first.");
       return;
     }
     writeBtn.disabled = true;
     try {
-      log("sending transaction...");
+      setStatus("pending", "Sending transaction...");
       const tx = await contract.setMessage(newMessage);
-      log("waiting for confirmation... tx: " + tx.hash);
+      setStatus("pending", "Waiting for confirmation...");
       await tx.wait();
-      log("message updated on-chain.", "ok");
-      document.getElementById("newMessageInput").value = "";
+      const etherscanUrl = `https://sepolia.etherscan.io/tx/${tx.hash}`;
+      setStatus("ok", `<span class="msg-title">Transaction confirmed</span><br>Message updated on-chain. &middot; <a href="${etherscanUrl}" target="_blank" rel="noreferrer">View on Etherscan ↗</a>`);
+      input.value = "";
       await readMessage();
     } catch (err) {
-      log("transaction failed: " + err.message, "err");
+      setStatus("err", "Transaction failed: " + err.message);
     } finally {
       writeBtn.disabled = false;
     }
   });
+
+  // --- background network/constellation effect ---
+  (function () {
+    const canvas = document.getElementById("network-bg");
+    const ctx = canvas.getContext("2d");
+    let w, h, points;
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      const count = Math.floor((w * h) / 22000);
+      points = Array.from({ length: count }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.15,
+      }));
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function tick() {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of points) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+      }
+      for (let i = 0; i < points.length; i++) {
+        for (let j = i + 1; j < points.length; j++) {
+          const dx = points[i].x - points[j].x;
+          const dy = points[i].y - points[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 130) {
+            ctx.strokeStyle = `rgba(124, 108, 246, ${0.12 * (1 - dist / 130)})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(points[i].x, points[i].y);
+            ctx.lineTo(points[j].x, points[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      for (const p of points) {
+        ctx.fillStyle = "rgba(124, 108, 246, 0.35)";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
 </script>
 
 </body>
